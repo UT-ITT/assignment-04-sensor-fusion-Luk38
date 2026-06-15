@@ -51,6 +51,8 @@ WINDOW_HEIGHT, WINDOW_WIDTH = initial_frame.shape[:2]
 
 window = pyglet.window.Window(WINDOW_WIDTH, WINDOW_HEIGHT)
 latest_display_frame = initial_frame.copy()
+phone_position = None
+PHONE_MARKER_ID = 5
 
 # Helper functions for clamping values and ordering points
 def clamp(value, minimum, maximum):
@@ -127,18 +129,50 @@ def warp_board(frame, marker_corners):
     return warped, transform
 
 def process_frame(frame, dt):
-    global latest_display_frame
+    global latest_display_frame, phone_position
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     corners, ids, _ = detector.detectMarkers(gray)
-    
-    # warp the view between the markers
-    warped_frame, transform = warp_board(frame, corners) if ids is not None and len(corners) > 0 else (None, None)
 
-    if warped_frame is not None:        
+    warped_frame, transform = (
+        warp_board(frame, corners)
+        if ids is not None and len(corners) >= 4
+        else (None, None)
+    )
+
+    phone_position = None
+
+    if warped_frame is not None:
+        if ids is not None:
+            for marker_corners, marker_id in zip(corners, ids.flatten()):
+                if marker_id == PHONE_MARKER_ID:
+                    center = np.mean(
+                        marker_corners[0],
+                        axis=0
+                    )
+                    pt = np.array(
+                        [[[center[0], center[1]]]],
+                        dtype=np.float32
+                    )
+                    warped_pt = cv2.perspectiveTransform(pt,transform)
+                    x, y = warped_pt[0][0]
+                    phone_position = (
+                        int(x),
+                        int(y)
+                    )
+                    break
         board_frame = warped_frame.copy()
+
+        if phone_position is not None:
+            cv2.circle(
+                board_frame,
+                phone_position,
+                15,
+                (0, 0, 255),
+                -1
+            )
+
     else:
-        latest_finger_pos = None
         board_frame = frame.copy()
 
     latest_display_frame = board_frame
@@ -167,6 +201,6 @@ def on_draw():
     img = cv2glet(latest_display_frame, 'BGR')
     img.blit(0, 0, 0)
 
-
 pyglet.app.run()
 cap.release()
+cv2.destroyAllWindows()
