@@ -11,12 +11,14 @@ import sys
 from pathlib import Path
 from pyglet.window import key 
 
+# MediaPipe hand landmarker setup
 MODEL_PATH = Path(__file__).with_name('hand_landmarker.task')
 BaseOptions = mp.tasks.BaseOptions
 HandLandmarker = mp.tasks.vision.HandLandmarker
 HandLandmarkerOptions = mp.tasks.vision.HandLandmarkerOptions
 VisionRunningMode = mp.tasks.vision.RunningMode
 
+# Initialize MediaPipe Landmarker
 landmarker = HandLandmarker.create_from_options(
     HandLandmarkerOptions(
         base_options=BaseOptions(model_asset_path=str(MODEL_PATH)),
