@@ -27,3 +27,22 @@ Man kann das Fenster und Programm mit Q oder ESC beenden.
 Es kann vorkommen dass eine falsche Hand erkannt wird, weil vom original frame und nicht vom gewarpten getrackt wird. Um das zu beheben sollte man die Hände aus der Kamera nehmen und neu hinhalten.
 
 Wenn man außerhalb vom unteren Bordrand seinen finger bewegt, kann man den Schläger ganz am Rand unten bewegen.
+
+## 3. Sensor Fusion
+Das Rechteck innerhalb der Marker wird wie in der vorherigen Aufgabe erkannt und gewarped.
+
+Wenn man das Smartphone mit dem fünften Marker in die Kamera hält, wird der Marker mit ID 5 erkannt und ein roter Kreis darauf gezeichnet.
+Außerdem muss man mit dem DIPPID Device an Port 5700 senden, sodass basierend auf den accelerometerdaten eine position auf dem bord vorhergesagt wird, auf die ein grüner Kreis gezeichnet wird.
+
+Mit Button 1 in der Dippid App kann man die vorhersage reseten. 
+
+Mit der rechten Pfeiltaste den alpha Wert erhöhen, mit der linken verringern. Der aktuelle Alpha-Wert wird im Fenster angezeigt.
+
+Das Fenster und Programm lässt sich mit Q oder ESC beenden.
+
+Zum Alpha-Wert: 
+
+- Bei kleinem Alpha = 0.1 wird mehr auf die Kamera vertraut und die Vorhersage durch Accelerometer ist nicht stark, sodass der grüne Punkt dem roten viel schneller folgt.
+- Bei großem Alpha = 0.95 ist die Vorhersage sehr stark und der grüne Punkt kann abdriften, da er hauptsächlich durch die Accelerometerdaten gestuert wird.
+- Bei Alpha = 1.0 werden nur die Accelerometerdaten genommen und der grüne Punkt orrientiert sich garnicht mehr an dem Roten sondern nur an der Bewegung des DIPPID device.
+

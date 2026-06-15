@@ -5,6 +5,8 @@ import pyglet
 from pyglet.window import key
 from PIL import Image
 import sys
+import time
+from DIPPID import SensorUDP
 
 video_id = 0
 
@@ -54,6 +56,18 @@ latest_display_frame = initial_frame.copy()
 phone_position = None
 PHONE_MARKER_ID = 5
 
+predicted_position = None
+
+velocity_x = 0.0
+velocity_y = 0.0
+
+alpha = 0.95
+ACCEL_SCALE = 300.0
+
+# DIPPID sensor setup
+PORT = 5700
+sensor = SensorUDP(PORT)
+
 # Helper functions for clamping values and ordering points
 def clamp(value, minimum, maximum):
     return max(minimum, min(maximum, value))
@@ -99,7 +113,7 @@ def get_board_corners(marker_corners):
 
     return np.array(board_corners, dtype='float32')
 
-
+# transform the frame to rectangle defined by the markers
 def warp_board(frame, marker_corners):
     board_corners = get_board_corners(marker_corners)
 
@@ -127,6 +141,51 @@ def warp_board(frame, marker_corners):
     )
 
     return warped, transform
+
+def update_prediction(dt):
+    global predicted_position
+    global velocity_x
+    global velocity_y
+
+    if sensor.has_capability("button_1"):
+        if sensor.get_value("button_1"):
+            velocity_x = 0.0
+            velocity_y = 0.0
+            if phone_position is not None:
+                predicted_position = (
+                    float(phone_position[0]),
+                    float(phone_position[1])
+                )
+
+    if not sensor.has_capability("accelerometer"):
+        return
+
+    ax = sensor.get_value("accelerometer")['x']
+    ay = sensor.get_value("accelerometer")['y']
+
+    velocity_x += ax * ACCEL_SCALE * dt
+    velocity_y += ay * ACCEL_SCALE * dt
+    velocity_x *= 0.98
+    velocity_y *= 0.98
+
+    if predicted_position is None:
+        predicted_position = (
+            WINDOW_WIDTH / 2,
+            WINDOW_HEIGHT / 2
+        )
+
+    predicted_position = (
+        predicted_position[0] + velocity_x * dt,
+        predicted_position[1] + velocity_y * dt
+    )
+
+    if phone_position is not None:
+        predicted_position = (
+            alpha * predicted_position[0]
+            + (1.0 - alpha) * phone_position[0],
+            alpha * predicted_position[1]
+            + (1.0 - alpha) * phone_position[1]
+        )
 
 def process_frame(frame, dt):
     global latest_display_frame, phone_position
@@ -171,6 +230,25 @@ def process_frame(frame, dt):
                 (0, 0, 255),
                 -1
             )
+        if predicted_position is not None:
+            cv2.circle(
+                board_frame,
+                (
+                    int(predicted_position[0]),
+                    int(predicted_position[1])
+                ),
+                15,
+                (0, 255, 0),
+                -1
+            )
+        cv2.putText(
+            board_frame,
+            f"alpha={alpha:.2f}",
+            (20, 40),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            (255,255,255),
+            2)
 
     else:
         board_frame = frame.copy()
@@ -185,8 +263,17 @@ def update(dt):
 
     process_frame(frame, dt)
 
+    update_prediction(dt)
+
 @window.event
 def on_key_press(symbol, modifiers):
+    global alpha
+    if symbol == key.LEFT:
+        alpha = max(0.0, alpha - 0.05)
+
+    if symbol == key.RIGHT:
+        alpha = min(1.0, alpha + 0.05)
+
     if symbol in (key.Q, key.ESCAPE): # quit on Q or ESC
         cap.release()
         window.close()
@@ -203,4 +290,3 @@ def on_draw():
 
 pyglet.app.run()
 cap.release()
-cv2.destroyAllWindows()
