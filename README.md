@@ -21,7 +21,7 @@ Mit [Mediapipe](https://developers.google.com/edge/mediapipe/solutions/vision/ha
 
 Mit dem Zeigefinger kann man dann den Schläger frei im Bild bewegen und muss verhindern, dass der Ball zum unteren Bildrand gelangt.
 
-Pro Abpraller am oberen Bildrand bekommt man einen Punkt, wenn der Ball den unteren berührt wird der Score zurückgesetzt und man muss von 0 anfangen.
+Pro Abpraller am oberen Bildrand bekommt man einen Punkt, wenn der Ball den unteren Rand berührt wird der Score zurückgesetzt und man muss von 0 anfangen.
 Man kann das Fenster und Programm mit Q oder ESC beenden.
 
 Es kann vorkommen dass eine falsche Hand erkannt wird, weil vom original frame und nicht vom gewarpten getrackt wird. Um das zu beheben sollte man die Hände aus der Kamera nehmen und neu hinhalten.
