@@ -8,7 +8,7 @@ python image_extractor.py --input_path INPUT_PATH --output_path OUTPUT_PATH --re
 ```
 Für den output path auch genau den Dateinamen mit Endung eingeben. Beispiel:
 ```
-python image_extractor.py --input_path perspective_transformation/sample_image.jpg --output_path sample_image_warped.jpg --resolution 800 600
+python perspective_transformation/image_extractor.py --input_path perspective_transformation/sample_image.jpg --output_path sample_image_warped.jpg --resolution 800 600
 ```
 - ESC Änderungen Rückgängig machen
 - S Neues Bild unter den Output path speichern
@@ -34,7 +34,7 @@ Das Rechteck innerhalb der Marker wird wie in der vorherigen Aufgabe erkannt und
 Wenn man das Smartphone mit dem fünften Marker in die Kamera hält, wird der Marker mit ID 5 erkannt und ein roter Kreis darauf gezeichnet.
 Außerdem muss man mit dem DIPPID Device an Port 5700 senden, sodass basierend auf den accelerometerdaten eine position auf dem bord vorhergesagt wird, auf die ein grüner Kreis gezeichnet wird.
 
-Mit Button 1 in der Dippid App kann man die vorhersage reseten. 
+Mit Button 1 in der Dippid App kann man die vorhersage reseten, falls der grüne Kreis zu sehr abdriftet.
 
 Mit der rechten Pfeiltaste den alpha Wert erhöhen, mit der linken verringern. Der aktuelle Alpha-Wert wird im Fenster angezeigt.
 
