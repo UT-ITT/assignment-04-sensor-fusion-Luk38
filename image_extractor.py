@@ -23,6 +23,7 @@ if img is None:
 
 cv2.namedWindow(WINDOW_NAME)
 
+original_img = img.copy()
 display_img = img.copy()
 selected_points = []
 warped_img = None
@@ -52,14 +53,14 @@ def warp_selected_rectangle(points):
         dtype='float32',
     )
     transform = cv2.getPerspectiveTransform(ordered_points, destination_points)
-    warped_img = cv2.warpPerspective(img, transform, (width, height))
+    warped_img = cv2.warpPerspective(original_img, transform, (width, height))
     cv2.imshow(WARPED_WINDOW_NAME, warped_img)
 
 def reset_selection():
     global display_img, warped_img
 
     selected_points.clear()
-    display_img = img.copy()
+    display_img = original_img.copy()
     warped_img = None
     cv2.imshow(WINDOW_NAME, display_img)
     cv2.destroyWindow(WARPED_WINDOW_NAME)
